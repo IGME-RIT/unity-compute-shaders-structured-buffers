@@ -1,0 +1,25 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Translate
+
+struct transformData {
+	float4x4 transformationMatrix;
+	float4 color;
+	float3 velocity;
+	float mass;
+};
+
+RWStructuredBuffer<transformData> dataBuffer;
+RWStructuredBuffer<float4x4> transformBuffer;
+
+float deltaTime;
+
+[numthreads(64,1,1)]
+void Translate (uint3 id : SV_DispatchThreadID)
+{
+	dataBuffer[id.x].velocity -= (dataBuffer[id.x].transformationMatrix._14_24_34 * .1f) / dataBuffer[id.x].mass;
+	dataBuffer[id.x].transformationMatrix._14 += dataBuffer[id.x].velocity.x * deltaTime;
+	dataBuffer[id.x].transformationMatrix._24 += dataBuffer[id.x].velocity.y * deltaTime;
+	dataBuffer[id.x].transformationMatrix._34 += dataBuffer[id.x].velocity.z * deltaTime;
+
+	transformBuffer[id.x] = dataBuffer[id.x].transformationMatrix;
+}
