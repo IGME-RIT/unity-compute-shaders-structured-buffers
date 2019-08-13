@@ -6,20 +6,20 @@ Documentation Author: Alexander Amling
 
 *Unity Compute Shaders Part 4*
 
-As mentioned in part 3
+As mentioned in part 3, compute buffers are very flexible, and compute shaders can accept structs to format the data passed in. For our code, we will use the following:
 
 ```
-struct transformData {
-	float4x4 transformationMatrix;
-	float4 color;
-	float3 velocity;
-	float mass;
+struct transformData 
+{
+    float4x4 transformationMatrix;
+    float4 color;
+    float3 velocity;
+    float mass;
 };
 ```
-Is the same as
+Which is the same as
 ```
-public struct transformData
-{
+public struct transformData {
     public Matrix4x4 transformMatrix;
     public Vector4 color;
     public Vector3 velocity;
