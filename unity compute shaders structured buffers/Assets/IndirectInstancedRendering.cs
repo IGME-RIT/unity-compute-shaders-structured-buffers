@@ -26,6 +26,7 @@ public class IndirectInstancedRendering : MonoBehaviour
     int translationKernel;
 
     ComputeBuffer transformBuffer;
+    ComputeBuffer colorBuffer;
     
     ComputeBuffer argsBuffer;
     uint[] args;
@@ -38,6 +39,7 @@ public class IndirectInstancedRendering : MonoBehaviour
         translationKernel = transformationShader.FindKernel("Translate");
 
         transformBuffer = new ComputeBuffer(instanceCount, sizeof(float) * 16);
+        colorBuffer = new ComputeBuffer(instanceCount, sizeof(float) * 4);
 
         dataBuffer = new ComputeBuffer(instanceCount, sizeof(float) * 24);
         dataArray = new transformData[instanceCount];
@@ -69,31 +71,26 @@ public class IndirectInstancedRendering : MonoBehaviour
         Vector3 scale = new Vector3();
         for (int i = 0; i < instanceCount; i++)
         {
+            // set transform
             pos = Random.insideUnitSphere * 50;
             rot = Random.rotation;
             scale = new Vector3(Random.Range(0, 2.0f), Random.Range(0, 2.0f), Random.Range(0, 2.0f));
             dataArray[i].transformMatrix = Matrix4x4.TRS(pos, rot, scale);
-        }
-
-        // set starting velocity
-        for (int i = 0; i < instanceCount; i++)
-        {
+        
+            // set starting velocity
             dataArray[i].velocity = new Vector3(Random.Range(0, 2.0f), Random.Range(0, 2.0f), Random.Range(0, 2.0f));
-        }
-
-        // set starting color
-        for (int i = 0; i < instanceCount; i++)
-        {
-            dataArray[i].color = new Vector4(Random.Range(0, 1.0f), Random.Range(0, 1.0f), Random.Range(0, 1.0f), Random.Range(0, 1.0f));
-        }
-
-        // set starting mass
-        for (int i = 0; i < instanceCount; i++)
-        {
+        
+            // set starting color
+            dataArray[i].color = new Vector4(Random.Range(0, 1.0f), Random.Range(0, 1.0f), Random.Range(0, 1.0f), 1f);
+        
+            // set starting mass
             dataArray[i].mass = Random.Range(1, 5f);
         }
 
         dataBuffer.SetData(dataArray);
+
+        instanceMaterial.SetBuffer("colorBuffer", colorBuffer);
+        transformationShader.SetBuffer(translationKernel, "colorBuffer", colorBuffer);
 
         instanceMaterial.SetBuffer("transformBuffer", transformBuffer);
         transformationShader.SetBuffer(translationKernel, "transformBuffer", transformBuffer);
@@ -141,6 +138,12 @@ public class IndirectInstancedRendering : MonoBehaviour
         {
             transformBuffer.Release();
             transformBuffer = null;
+        }
+
+        if (colorBuffer != null)
+        {
+            colorBuffer.Release();
+            colorBuffer = null;
         }
     }
 }

@@ -23,6 +23,10 @@
 
         sampler2D _MainTex;
 
+        half _Glossiness;
+        half _Metallic;
+        fixed4 _Color;
+
         struct Input
         {
             float2 uv_MainTex;
@@ -30,18 +34,16 @@
 
 		#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
 			StructuredBuffer<float4x4> transformBuffer;
+			StructuredBuffer<float4> colorBuffer;
 		#endif
 
 		void setup()
 		{
 		#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
 			unity_ObjectToWorld = transformBuffer[unity_InstanceID];
+			_Color = colorBuffer[unity_InstanceID];
 		#endif
 		}
-
-        half _Glossiness;
-        half _Metallic;
-        fixed4 _Color;
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {

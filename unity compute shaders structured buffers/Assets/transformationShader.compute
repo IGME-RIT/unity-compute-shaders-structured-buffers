@@ -10,6 +10,7 @@ struct transformData {
 
 RWStructuredBuffer<transformData> dataBuffer;
 RWStructuredBuffer<float4x4> transformBuffer;
+RWStructuredBuffer<float4> colorBuffer;
 
 float deltaTime;
 
@@ -22,4 +23,6 @@ void Translate (uint3 id : SV_DispatchThreadID)
 	dataBuffer[id.x].transformationMatrix._34 += dataBuffer[id.x].velocity.z * deltaTime;
 
 	transformBuffer[id.x] = dataBuffer[id.x].transformationMatrix;
+
+	colorBuffer[id.x] = dataBuffer[id.x].color;
 }
